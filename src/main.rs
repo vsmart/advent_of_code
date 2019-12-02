@@ -64,11 +64,9 @@ fn consume_line(nums: &Vec<i32>, index: &usize) -> i32 {
     }
 }
 
-fn day_2_1() {
-    let mut nums = read_input_day2();
-
-    nums[1] = 12;
-    nums[2] = 2;
+fn run_computer(mut nums: Vec<i32>, noun: i32, verb: i32) -> i32 {
+    nums[1] = noun;
+    nums[2] = verb;
 
     let len = nums.len() - 1;
 
@@ -80,9 +78,33 @@ fn day_2_1() {
         nums[store_val as usize] = consume_line(&nums, &i);
     };
 
-    println!("final answer: {:?}", nums[0]);
+    nums[0]
+}
+
+fn day_2_1() {
+    let mut nums = read_input_day2();
+    let res = run_computer(nums, 12, 2);
+
+    println!("final answer: {:?}", res);
+}
+
+fn day_2_2(){
+    let nums = read_input_day2();
+
+    for i in 0..99 {
+        for k in 0..99 {
+            let copy = nums.clone();
+            let res = run_computer(copy, i, k);
+            if res == 19690720 {
+                let fin = 100 * i + k;
+
+                println!("{} - {} - {},{} ", fin, res, i, k);
+                break;
+            };
+        }
+    }
 }
 
 fn main() {
-    day_2_1();
+    day_2_2();
 }
