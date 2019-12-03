@@ -1,5 +1,6 @@
 use std::fs::File;
 use std::io::prelude::*;
+use std::collections::HashMap;
 
 fn read_file() -> Vec<i32> {
     let mut file = File::open("./inputs/day_1").expect("File could not be opened");
@@ -105,6 +106,62 @@ fn day_2_2(){
     }
 }
 
+// 0 means start
+// 1 means a simple cable
+// 2 means a cross
+fn map_cables_on_grid(cable: Vec<(char, i32)>, cable2: Vec<(char, i32)>) -> HashMap<(i32, i32), i32> {
+
+    let mut start = (0, 0);
+    let mut map = HashMap::new();
+    map.insert((0, 0), 0);
+
+    for e in cable.iter() {
+        let (x, y) = match e.0 {
+            'R' => { ( start.0 + e.1, start.1) },
+            'L' => { ( start.0 - e.1, start.1) },
+            'U' => { ( start.0, start.1 + e.1) },
+            'D' => { ( start.0, start.1 - e.1) },
+            _ => { panic!("Unexpected input"); }
+        };
+
+        map.insert((x, y), 1);
+        start = (x, y)
+    }
+
+    println!("{:?}", map);
+
+    for e in cable2.iter() {
+        let (x, y) = match e.0 {
+            'R' => { ( start.0 + e.1, start.1) },
+            'L' => { ( start.0 - e.1, start.1) },
+            'U' => { ( start.0, start.1 + e.1) },
+            'D' => { ( start.0, start.1 - e.1) },
+            _ => { panic!("Unexpected input"); }
+        };
+
+        if map.contains_key(&(x,y)) {
+            let k = map.get(&(x, y));
+            if k == Some(&1) { map.insert((x, y), 2) }
+            else { panic!("something weird happened"); }
+        }
+        else { map.insert((x, y), 1) };
+        start = (x, y)
+    }
+
+
+    map
+}
+
+
+fn day_3_1() {
+    let cables_1 = vec![('R', 8) , ('U', 5), ('L', 5) , ('D', 3)];
+    let cables_2 = vec![('U', 7) , ('R', 6), ('D', 4) , ('L', 4)];
+
+    let grid = map_cables_on_grid(cables_1, cables_2);
+
+}
+
+
 fn main() {
-    day_2_2();
+    day_3_1();
 }
