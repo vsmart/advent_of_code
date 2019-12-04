@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::io::prelude::*;
 use std::collections::HashMap;
+use std::collections::HashSet;
 
 fn read_file() -> Vec<i32> {
     let mut file = File::open("./inputs/day_1").expect("File could not be opened");
@@ -109,7 +110,7 @@ fn day_2_2(){
 // 0 means start
 // 1 means a simple cable
 // 2 means a cross
-fn map_cables_on_grid(cable: Vec<(char, i32)>, cable2: Vec<(char, i32)>) -> HashMap<(i32, i32), i32> {
+fn map_cables_on_grid(cable: Vec<(char, i32)>, cable2: Vec<(char, i32)>) -> HashSet<(i32, i32)> {
 
     let mut start = (0, 0);
     let mut map = HashMap::new();
@@ -117,50 +118,160 @@ fn map_cables_on_grid(cable: Vec<(char, i32)>, cable2: Vec<(char, i32)>) -> Hash
 
     for e in cable.iter() {
         let (x, y) = match e.0 {
-            'R' => { ( start.0 + e.1, start.1) },
-            'L' => { ( start.0 - e.1, start.1) },
-            'U' => { ( start.0, start.1 + e.1) },
-            'D' => { ( start.0, start.1 - e.1) },
+            'R' => {
+                    for i in 0..e.1 {
+                      map.insert(( start.0 + i, start.1), 1);
+                    }
+                     (start.0 + e.1, start.1)
+            },
+            'L' => {
+                    for i in 0..e.1 {
+                      map.insert(( start.0 - i, start.1), 1);
+                    }
+                     ( start.0 - e.1, start.1) },
+            'U' => {
+                    for i in 0..e.1 {
+                      map.insert(( start.0, start.1 + i), 1);
+                    }
+                    ( start.0, start.1 + e.1) },
+            'D' => {
+                    for i in 0..e.1 {
+                      map.insert(( start.0, start.1 - i), 1);
+                    }
+                    ( start.0, start.1 - e.1)
+                    },
             _ => { panic!("Unexpected input"); }
         };
 
-        map.insert((x, y), 1);
+
+
         start = (x, y)
     }
 
     println!("{:?}", map);
 
+
+    let mut intersections = HashSet::new();
+    start = (0,0);
+
     for e in cable2.iter() {
         let (x, y) = match e.0 {
-            'R' => { ( start.0 + e.1, start.1) },
-            'L' => { ( start.0 - e.1, start.1) },
-            'U' => { ( start.0, start.1 + e.1) },
-            'D' => { ( start.0, start.1 - e.1) },
+            'R' => { for i in 0..e.1 {
+
+                       let new_x = start.0 + i;
+                       let new_y = start.1;
+
+
+                       let exists = map.contains_key(&(new_x, new_y));
+
+                       println!("R - {}, {}: {}", new_x, new_y, exists);
+                       if exists {
+                           intersections.insert((new_x, new_y));
+                       }
+                    }
+                    (start.0 + e.1, start.1)
+            },
+            'L' => {
+                for i in 0..e.1 {
+
+                    let new_x = start.0 - i;
+                    let new_y = start.1;
+
+
+                    let exists = map.contains_key(&(new_x, new_y));
+
+                       println!("L - {}, {}: {}", new_x, new_y, exists);
+                    if exists {
+                        intersections.insert((new_x, new_y));
+                    }
+                }
+                     ( start.0 - e.1, start.1) },
+            'U' => {
+                    for i in 0..e.1 {
+                        let new_x = start.0;
+                        let new_y = start.1 + i;
+
+
+                    let exists = map.contains_key(&(new_x, new_y));
+
+                       println!("U - {}, {}: {}", new_x, new_y, exists);
+
+                    if exists {
+                        intersections.insert((new_x, new_y));
+                    }
+                    }
+                    ( start.0, start.1 + e.1) },
+            'D' => {
+                    for i in 0..e.1 {
+                        let new_x = start.0;
+                        let new_y = start.1 - i;
+
+
+                        let exists = map.contains_key(&(new_x, new_y));
+
+                       println!("D - {}, {}: {}", new_x, new_y, exists);
+
+                        if exists {
+                            intersections.insert((new_x, new_y));
+                        }
+
+                    }
+                    ( start.0, start.1 - e.1)
+                    },
             _ => { panic!("Unexpected input"); }
         };
 
-        if map.contains_key(&(x,y)) {
-            let k = map.get(&(x, y));
-            if k == Some(&1) { map.insert((x, y), 2) }
-            else { panic!("something weird happened"); }
-        }
-        else { map.insert((x, y), 1) };
-        start = (x, y)
+       start = (x, y)
     }
 
-
-    map
+    intersections
 }
 
+fn find_closest_point(set: &HashSet<(i32, i32)>) -> i32 {
+    let mut shortest_distance = -1;
+    for (x, y) in set.iter() {
+        let distance = x.abs() + y.abs();
+        if (distance < shortest_distance || shortest_distance == -1) {
+            shortest_distance = distance;
+        }
+    }
+    shortest_distance
+}
+
+fn day_3_1_read_input() -> (Vec<(char, i32)>, Vec<(char, i32)>){
+    let mut file = File::open("./inputs/day_3").expect("File could not be opened");
+    let mut contents = String::new();
+    file.read_to_string(&mut contents).expect("Can't read from file");
+
+    let str = contents.lines().next().unwrap();
+    let c1:Vec<(char, i32)> = str.trim().split(",").map(|s| (s.chars().next().unwrap() as char, s.split_at(1).1.parse::<i32>().expect("could not be parsed to int"))).collect();
+
+    let str2 = contents.lines().nth(1).unwrap();
+    let c2:Vec<(char, i32)> = str2.trim().split(",").map(|s| (s.chars().next().unwrap() as char, s.split_at(1).1.parse::<i32>().expect("could not be parsed to int"))).collect();
+
+    println!("{:?}", c1);
+    println!("{:?}", c2);
+
+    (c1, c2)
+}
 
 fn day_3_1() {
-    let cables_1 = vec![('R', 8) , ('U', 5), ('L', 5) , ('D', 3)];
-    let cables_2 = vec![('U', 7) , ('R', 6), ('D', 4) , ('L', 4)];
 
-    let grid = map_cables_on_grid(cables_1, cables_2);
+    let input = day_3_1_read_input();
+    let cables_1: Vec<(char, i32)> = input.0;
+    let cables_2: Vec<(char, i32)> = input.1;
+
+    println!("{:?}", cables_1);
+    println!("{:?}", cables_2);
+
+    let mut intersections = map_cables_on_grid(cables_1, cables_2);
+    intersections.remove(&(0, 0));
+    println!("intersections: {:?}", &intersections);
+
+    let distance = find_closest_point(&intersections);
+    println!("distance: {:?}", &distance);
 
 }
-
 
 fn main() {
     day_3_1();
