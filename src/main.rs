@@ -1,7 +1,6 @@
 use std::fs::File;
 use std::io::prelude::*;
 use std::collections::HashMap;
-use std::collections::HashSet;
 
 fn read_file() -> Vec<i32> {
     let mut file = File::open("./inputs/day_1").expect("File could not be opened");
@@ -110,33 +109,35 @@ fn day_2_2(){
 // 0 means start
 // 1 means a simple cable
 // 2 means a cross
-fn map_cables_on_grid(cable: Vec<(char, i32)>, cable2: Vec<(char, i32)>) -> HashSet<(i32, i32)> {
+fn map_cables_on_grid(cable: Vec<(char, i32)>, cable2: Vec<(char, i32)>) -> HashMap<(i32, i32), i32> {
 
     let mut start = (0, 0);
-    let mut map = HashMap::new();
-    map.insert((0, 0), 0);
 
-    for e in cable.iter() {
+    // (x, y), (num, steps)
+    let mut map = HashMap::new();
+    map.insert((0, 0), (0, 0));
+
+    for (n, e) in cable.iter().enumerate() {
         let (x, y) = match e.0 {
             'R' => {
                     for i in 0..e.1 {
-                      map.insert(( start.0 + i, start.1), 1);
+                      map.insert(( start.0 + i, start.1), (1, n ));
                     }
                      (start.0 + e.1, start.1)
             },
             'L' => {
                     for i in 0..e.1 {
-                      map.insert(( start.0 - i, start.1), 1);
+                      map.insert(( start.0 - i, start.1), (1, n));
                     }
                      ( start.0 - e.1, start.1) },
             'U' => {
                     for i in 0..e.1 {
-                      map.insert(( start.0, start.1 + i), 1);
+                      map.insert(( start.0, start.1 + i), (1, n));
                     }
                     ( start.0, start.1 + e.1) },
             'D' => {
                     for i in 0..e.1 {
-                      map.insert(( start.0, start.1 - i), 1);
+                      map.insert(( start.0, start.1 - i), (1, n));
                     }
                     ( start.0, start.1 - e.1)
                     },
@@ -151,10 +152,10 @@ fn map_cables_on_grid(cable: Vec<(char, i32)>, cable2: Vec<(char, i32)>) -> Hash
     println!("{:?}", map);
 
 
-    let mut intersections = HashSet::new();
+    let mut intersections = HashMap::new();
     start = (0,0);
 
-    for e in cable2.iter() {
+    for (n, e) in cable2.iter().enumerate() {
         let (x, y) = match e.0 {
             'R' => { for i in 0..e.1 {
 
@@ -166,7 +167,8 @@ fn map_cables_on_grid(cable: Vec<(char, i32)>, cable2: Vec<(char, i32)>) -> Hash
 
                        println!("R - {}, {}: {}", new_x, new_y, exists);
                        if exists {
-                           intersections.insert((new_x, new_y));
+                           let (_, steps) = map.get(&(new_x, new_y)).unwrap();
+                           intersections.insert((new_x, new_y), steps + n);
                        }
                     }
                     (start.0 + e.1, start.1)
@@ -182,7 +184,8 @@ fn map_cables_on_grid(cable: Vec<(char, i32)>, cable2: Vec<(char, i32)>) -> Hash
 
                        println!("L - {}, {}: {}", new_x, new_y, exists);
                     if exists {
-                        intersections.insert((new_x, new_y));
+                           let (_, steps) = map.get(&(new_x, new_y)).unwrap();
+                           intersections.insert((new_x, new_y), steps + n);
                     }
                 }
                      ( start.0 - e.1, start.1) },
@@ -197,7 +200,8 @@ fn map_cables_on_grid(cable: Vec<(char, i32)>, cable2: Vec<(char, i32)>) -> Hash
                        println!("U - {}, {}: {}", new_x, new_y, exists);
 
                     if exists {
-                        intersections.insert((new_x, new_y));
+                           let (_, steps) = map.get(&(new_x, new_y)).unwrap();
+                           intersections.insert((new_x, new_y), steps + n);
                     }
                     }
                     ( start.0, start.1 + e.1) },
@@ -212,7 +216,8 @@ fn map_cables_on_grid(cable: Vec<(char, i32)>, cable2: Vec<(char, i32)>) -> Hash
                        println!("D - {}, {}: {}", new_x, new_y, exists);
 
                         if exists {
-                            intersections.insert((new_x, new_y));
+                           let (_, steps) = map.get(&(new_x, new_y)).unwrap();
+                           intersections.insert((new_x, new_y), steps + n);
                         }
 
                     }
@@ -227,7 +232,7 @@ fn map_cables_on_grid(cable: Vec<(char, i32)>, cable2: Vec<(char, i32)>) -> Hash
     intersections
 }
 
-fn find_closest_point(set: &HashSet<(i32, i32)>) -> i32 {
+fn find_closest_point(set: &HashMap<(i32, i32), i32>) -> i32 {
     let mut shortest_distance = -1;
     for (x, y) in set.iter() {
         let distance = x.abs() + y.abs();
