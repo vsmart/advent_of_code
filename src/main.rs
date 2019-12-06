@@ -288,16 +288,30 @@ fn day_3_1() {
 }
 
 fn two_cons_nums(number: i32) -> bool {
-    true
+    let stri = number.to_string();
+    let (h, tail) = stri.split_at(1);
+    let mut head = h.chars().nth(0).unwrap();
+    for n in tail.chars() {
+        if head == n { return true; }
+        head = n;
+    }
+    false
 }
 
 fn increasing_nums(number: i32) -> bool {
+    let stri = number.to_string();
+    let (h, tail) = stri.split_at(1);
+    let mut head = h.chars().nth(0).unwrap();
+    for n in tail.chars() {
+        if n.to_digit(10) < head.to_digit(10) { return false }
+        head = n;
+    }
     true
 }
 
 fn day_4_1() {
-    let start = 11111;
-    let end = 44111;
+    let start = 138241;
+    let end = 674034;
     let mut passwords = vec![];
 
     for i in start..end {
@@ -305,7 +319,7 @@ fn day_4_1() {
             passwords.push(i as i32);
         }
     }
-    println!("{:?}", passwords);
+    println!("{:?}", passwords.len());
 }
 
 
