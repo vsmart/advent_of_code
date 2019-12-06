@@ -287,6 +287,28 @@ fn day_3_1() {
 
 }
 
+fn two_cons_nums(number: i32) -> bool {
+    true
+}
+
+fn increasing_nums(number: i32) -> bool {
+    true
+}
+
+fn day_4_1() {
+    let start = 11111;
+    let end = 44111;
+    let mut passwords = vec![];
+
+    for i in start..end {
+        if two_cons_nums(i as i32) && increasing_nums(i as i32) {
+            passwords.push(i as i32);
+        }
+    }
+    println!("{:?}", passwords);
+}
+
+
 fn main() {
-    day_3_1();
+    day_4_1();
 }
