@@ -1,7 +1,3 @@
-use std::fs::File;
-use std::io::prelude::*;
-use std::collections::HashMap;
-
 fn two_cons_nums(number: i32) -> bool {
     let stri = number.to_string();
     let (h, tail) = stri.split_at(1);
