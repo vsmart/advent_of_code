@@ -1,4 +1,4 @@
-## Advent of Code 2019
+## Advent of Code
 
 A new code puzzle each day: [advent of code](https://adventofcode.com/).
 
