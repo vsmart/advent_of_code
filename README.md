@@ -2,4 +2,5 @@
 
 A new code puzzle each day: [advent of code](https://adventofcode.com/).
 
-This year in Rust.
+* [2020 - NodeJS](./2020)
+* [2019 - Rust](./2019)
