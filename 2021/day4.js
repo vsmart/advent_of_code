@@ -20,7 +20,6 @@ function parseInput() {
     };
 }
 
-// Part 1
 function calc(input) {
   let board;
   let states;
@@ -55,8 +54,6 @@ function calc(input) {
                 }
 
                 result = sum * input.numbers[i]
-                console.log(`sum: ${sum}, number: ${input.numbers[i]}, res: ${result}`);
-
               }
             }
           }
