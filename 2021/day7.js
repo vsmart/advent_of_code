@@ -31,9 +31,9 @@ function search(input, range, lowest, start, end) {
     console.log('left wins with ', leftTotal, 'vs ', rightTotal)
     if (lowest > rightTotal) lowest = rightTotal;
     return search(input, range, lowest, start, mid-1);
+
   // right side is bigger
   } else {
-
     console.log('right wins with ', rightTotal, 'vs ', leftTotal)
     if (lowest > leftTotal) lowest = leftTotal;
     return search(input, range, lowest, mid+1, end);
